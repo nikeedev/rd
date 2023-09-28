@@ -1,3 +1,3 @@
 # rd
 
-Read directories better with rust!
+Read directories better with Rust!
