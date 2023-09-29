@@ -1,6 +1,9 @@
 use colored::*;
 use std::{env, fs, io, ffi::OsString};
 
+mod file_types;
+
+
 #[derive(Debug)]
 struct DirInfo {
     name: OsString,
@@ -8,10 +11,15 @@ struct DirInfo {
     file_ext: Option<OsString>
 }
 
+impl DirInfo {
+    fn print(&self) {
+        
+    }
+}
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
-    println!("{:#?}", args);
+
     let mut dir = "./";
     
     if args.len() > 2 {
@@ -22,12 +30,13 @@ fn main() -> io::Result<()> {
                 "Usage: rd [path]".blue()
             );
             std::process::exit(0);
+
         }
         dir = &args[1];
     }
 
-    let path = env::current_dir()?;
-    println!("Current dir 📂 {}", path.display().to_string().green());
+    let path = env::current_dir()?.display().to_string();
+    println!("{}", format!("Current dir  : {path}").bright_green().bold());
 
     // let mut entries = fs::read_dir(dir)?
     //     .map(|res| res.map(|e| e.path()))
