@@ -1,40 +1,46 @@
-use std::{fs, io, env};
 use colored::*;
+use std::{env, fs, io, path::PathBuf, ffi::{OsStr, OsString}};
 
+#[derive(Debug)]
+struct DirInfo {
+    name: OsString,
+    is_dir: bool,
+    file_ext: Option<OsString>
+}
 
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
-
-    let mut dir = args[1].to_string();
-
-    if args.len() < 1 {
-        dir = String::from("./");
-    }
-
-    if args[2] == "help" {
-        println!(
-            "{} - Nikita\'s version of ls\n{}", "rd".bright_blue(), "Usage: rd [path]".blue()
-        );
-        std::process::exit(0);
+    println!("{:#?}", args);
+    let mut dir = "./";
+    
+    if args.len() > 2 {
+        if args[2] == "--help" {
+            println!(
+                "{} - Nikita\'s version of ls\n{}",
+                "rd".bright_blue(),
+                "Usage: rd [path]".blue()
+            );
+            std::process::exit(0);
+        }
+        dir = &args[1];
     }
 
     let path = env::current_dir()?;
-    println!("Current dir {}", path.display());
+    println!("Current dir 📂 {}", path.display().to_string().green());
+
+    // let mut entries = fs::read_dir(dir)?
+    //     .map(|res| res.map(|e| e.path()))
+    //     .collect::<Result<Vec<_>, io::Error>>()?;
 
     let mut entries = fs::read_dir(dir)?
-        .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, io::Error>>()?;
+        .map(|res| {
+            res.map(|e| {
+                DirInfo { name: e.file_name(), is_dir: !e.metadata().unwrap().is_file(), file_ext: e.path().extension().map(|s| s.to_owned()) }
+            })
+        }).collect::<Result<Vec<DirInfo>, io::Error>>()?;
 
-    // The order in which `read_dir` returns entries is not guaranteed. If reproducible
-    // ordering is required the entries should be explicitly sorted.
-
-    entries.sort();
-
-    for i in 0..entries.len() {
-        println!("{}: {}", i.to_string(), String::from(entries[i].to_str().unwrap()).blue());
-    }
-    // The entries have now been sorted by their path.
+    println!("{:#?}", entries);
 
     Ok(())
 }
