@@ -1,5 +1,5 @@
 use colored::*;
-use std::{env, fs, io, path::PathBuf, ffi::{OsStr, OsString}};
+use std::{env, fs, io, ffi::OsString};
 
 #[derive(Debug)]
 struct DirInfo {
@@ -33,7 +33,7 @@ fn main() -> io::Result<()> {
     //     .map(|res| res.map(|e| e.path()))
     //     .collect::<Result<Vec<_>, io::Error>>()?;
 
-    let mut entries = fs::read_dir(dir)?
+    let entries = fs::read_dir(dir)?
         .map(|res| {
             res.map(|e| {
                 DirInfo { name: e.file_name(), is_dir: !e.metadata().unwrap().is_file(), file_ext: e.path().extension().map(|s| s.to_owned()) }
